@@ -96,3 +96,41 @@ def quit_session(username):
         add_logout_entry(username)
     else:
         print("Quitting...")
+
+def add_user():
+    username = input("Enter a new username: ")
+    password = input("Enter a new password for the user: ")
+    with open("PMS/Users.txt", "a", encoding="utf8") as file:
+        file.write(f"{username}-{password}\n")
+    print(f"User '{username}' was added successfully.")
+
+def add_admin():
+    admin_name = input("Enter new admin username: ")
+    admin_password = input("Enter new admin password: ")
+    with open("PMS/Admins.txt", "a", encoding="utf8") as file:
+        file.write(f"{admin_name}-{admin_password}\n")
+    print(f"Admin '{admin_name}' added successfully.")
+
+def list_users():
+    print("\n--- User List ---")
+    try:
+        with open("PMS/Users.txt", "r", encoding="utf8") as file:
+            users = file.readlines()
+            if not users:
+                print("No users found.")
+            for user in users:
+                print(user.strip().split('-')[0]) # Only show username
+    except FileNotFoundError:
+        print("No registered users found.")
+
+def list_admins():
+    print("\n--- Admin List ---")
+    try:
+        with open("PMS/Admins.txt", "r", encoding="utf8") as file:
+            admins = file.readlines()
+            if not admins:
+                print("No admins found.")
+            for admin in admins:
+                print(admin.strip().split('-')[0]) # Only show admin name
+    except FileNotFoundError:
+        print("No registered admins found.")
