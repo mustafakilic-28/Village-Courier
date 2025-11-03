@@ -124,6 +124,7 @@ def list_users():
         print("No registered users found.")
 
 def list_admins():
+
     print("\n--- Admin List ---")
     try:
         with open("PMS/Admins.txt", "r", encoding="utf8") as file:
@@ -132,5 +133,131 @@ def list_admins():
                 print("No admins found.")
             for admin in admins:
                 print(admin.strip().split('-')[0]) # Only show admin name
+    except FileNotFoundError:
+        print("No registered admins found.")
+
+def list_and_reset_logs():
+    print("\n--- System Logs ---")
+    try:
+        with open("PMS/Logs.txt", "r", encoding="utf8") as file:
+            logs = file.readlines()
+            if not logs:
+                print("No log entries found.")
+            for log in logs:
+                print(log.strip())
+    except FileNotFoundError:
+        print("Log file not found.")
+    
+    reset_choice = input("Do you want to reset the logs? (y/n): ")
+    if reset_choice.lower() == 'y':
+        with open("PMS/Logs.txt", "w", encoding="utf8") as file:
+            file.write("")
+        print("System logs have been reset.")
+
+def add_or_remove_product():
+    os.makedirs("PMS", exist_ok=True)
+
+    product_name = input("Enter product name: ").lower()
+
+    try:
+        change = int(input("Enter a positive number to add stock, a negative number to remove: "))
+    except ValueError:
+        print("Invalid number entered.")
+        return
+
+    products = {}
+    try:
+        with open("PMS/Products.txt", "r", encoding="utf8") as file:
+            for line in file:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    name, quantity = line.split("-", 1)
+                    products[name.strip()] = int(quantity.strip())
+                except ValueError:
+                    continue
+    except FileNotFoundError:
+        # If file doesn't exist, create it.
+        open("PMS/Products.txt", "w", encoding="utf8").close()
+
+    current_stock = products.get(product_name, 0)
+    new_stock = current_stock + change
+    
+    if product_name not in products and change <= 0:
+        print("Product does not exist, cannot remove stock.")
+        return
+    if new_stock < 0:
+        print(f"Not enough stock to remove. Current stock: {current_stock}")
+        return
+        
+    products[product_name] = new_stock
+    
+    with open("PMS/Products.txt", "w", encoding="utf8") as file:
+        for name, quantity in products.items():
+            if quantity > 0: # Only write products with stock > 0
+                file.write(f"{name}-{quantity}\n")
+
+    if change > 0:
+        print(f"{change} units added to '{product_name}'. New stock: {new_stock}")
+    elif change < 0:
+        print(f"{abs(change)} units removed from '{product_name}'. New stock: {new_stock}")
+    else:
+        print("No change in stock was made.")
+
+    if new_stock == 0:
+        print(f"Stock for '{product_name}' is now zero and it has been removed from the list.")
+
+def list_products():
+    print("\n--- Product List ---")
+    try:
+        with open("PMS/Products.txt", "r", encoding="utf8") as file:
+            products = file.readlines()
+            if not products:
+                print("No products found.")
+            for product in products:
+                print(product.strip())
+    except FileNotFoundError:
+        print("No products have been added yet.")
+
+def remove_user():
+    username_to_remove = input("Enter the username of the user to remove: ")
+    try:
+        with open("PMS/Users.txt", "r", encoding="utf8") as file:
+            users = file.readlines()
+        
+        user_found = False
+        with open("PMS/Users.txt", "w", encoding="utf8") as file:
+            for user in users:
+                if user.strip().split("-")[0] != username_to_remove:
+                    file.write(user)
+                else:
+                    user_found = True
+        
+        if user_found:
+            print(f"User '{username_to_remove}' was removed successfully.")
+        else:
+            print(f"User '{username_to_remove}' not found.") # Bug fix: f-string typo
+    except FileNotFoundError:
+        print("No registered users found.")
+        
+def remove_admin():
+    admin_to_remove = input("Enter the username of the admin to remove: ")
+    try:
+        with open("PMS/Admins.txt", "r", encoding="utf8") as file:
+            admins = file.readlines()
+            
+        admin_found = False
+        with open("PMS/Admins.txt", "w", encoding="utf8") as file:
+            for admin in admins:
+                if admin.strip().split("-")[0] != admin_to_remove:
+                    file.write(admin)
+                else:
+                    admin_found = True
+                    
+        if admin_found:
+            print(f"Admin '{admin_to_remove}' was removed successfully.")
+        else:
+            print(f"Admin '{admin_to_remove}' not found.")
     except FileNotFoundError:
         print("No registered admins found.")
