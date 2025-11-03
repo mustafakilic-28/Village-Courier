@@ -12,6 +12,7 @@ def main_menu():
 def admin_login():
     username = input("Enter admin username: ")
     password = input("Enter admin password: ")
+    print()
     try:
         with open("PMS/Admins.txt", "r", encoding="utf8") as file:
             for line in file:
@@ -20,6 +21,7 @@ def admin_login():
                     correct_username, correct_password = parts
                     if username == correct_username and password == correct_password:
                         add_log_entry(username)
+                        clear_screen()
                         print(f"Welcome, admin {username}!")
                         return username
         print("Incorrect admin username or password.")
@@ -31,6 +33,7 @@ def admin_login():
 def user_login():
     username = input("Enter username: ")
     password = input("Enter password: ")
+    print()
     try:
         with open("PMS/Users.txt", "r", encoding="utf8") as file:
             for line in file:
@@ -39,6 +42,7 @@ def user_login():
                     correct_username, correct_password = parts
                     if username == correct_username and password == correct_password:
                         add_log_entry(username)
+                        clear_screen()
                         print(f"Welcome, {username}!")
                         return username
         print("Incorrect username or password.")
@@ -260,4 +264,7 @@ def remove_admin():
         else:
             print(f"Admin '{admin_to_remove}' not found.")
     except FileNotFoundError:
-        print("No registered admins found.")
+            print("No registered admins found.")
+    
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
